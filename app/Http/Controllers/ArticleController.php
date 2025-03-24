@@ -54,22 +54,24 @@ class ArticleController extends Controller
             'data' => $article,
         ], 201);
     }
+
     public function articlesByCategory($categoryId)
     {
-
-        $articles = Article::where('category_id', $categoryId)->get();
-
+        $articles = Article::where('category_id', $categoryId)
+                            ->paginate(10); 
+    
         if ($articles->isEmpty()) {
             return response()->json([
                 'message' => __('messages.not_found'),
             ], 404);
         }
-
+    
         return response()->json([
             'message' => __('messages.operation_success'),
             'data' => $articles,
         ], 200);
     }
+
     public function show($id)
     {
         $article = Article::with( 'image')->find($id);
@@ -239,25 +241,24 @@ class ArticleController extends Controller
 
     public function searchByWebsiteName(Request $request)
     {
-
         $request->validate([
             'website_name' => 'required|string|max:255',
         ]);
-
+    
         $websiteName = $request->input('website_name');
-
-        $articles = Article::where('website_name', 'like', '%' . $websiteName . '%')->get();
-
+    
+        $articles = Article::where('website_name', 'like', '%' . $websiteName . '%')
+                           ->paginate(10); 
+    
         if ($articles->isEmpty()) {
             return response()->json(['message' => __('messages.not_found')], 404);
         }
-
+    
         return response()->json([
             'message' => __('messages.operation_success'),
             'data' => $articles,
         ], 200);
     }
-
     public function destroy(Request $request, $id = null)
     {
         if (is_null($id)) {
