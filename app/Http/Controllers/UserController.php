@@ -92,34 +92,47 @@ class UserController extends Controller
 //            'token' => $token,
 //        ]);
 //    }
-    public function login(Request $request)
-    {
 
-        $validator = Validator::make($request->all(), [
-            'user_name' => 'required|string|min:4|max:255',
-            'password' => 'required|string|min:6',
-        ]);
+    public function login(Request  $request)
+{
+    $validator = Validator::make($request->all(), [
+        'user_name' => 'required|string|min:4|max:255',
+        'password' => 'required|string|min:6',
+    ]);
 
-        if ($validator->fails()) {
-            return response(['errors' => $validator->errors()->all()], 422);
-        }
-
-        $encryptedUserName = Crypt::encryptString($request->user_name);
-
-        $user = User::where('user_name', $encryptedUserName)->first();
-
-        if (!$user || !password_verify($request->password, $user->password)) {
-            return response(['errors' => trans('messages.login_failed')], 422);
-        }
-
-        $token = $user->createToken('Personal Access Token')->accessToken;
-
-        return response([
-            'message' => trans('messages.login_success'),
-            'data' => $user,
-            'token' => $token,
-        ]);
+    if ($validator->fails()) {
+        return response(['errors' => $validator->errors()->all()], 422);
     }
+
+// الحصول على جميع المستخدمين (غير فعّال ولكن ضروري في هذه الحالة)
+$users = User::all();
+
+$foundUser = null;
+
+foreach ($users as $user) {
+    try {
+        $decryptedUserName = Crypt::decryptString($user->user_name);
+        if ($decryptedUserName === $request->user_name) {
+            $foundUser = $user;
+            break;
+        }
+    } catch (DecryptException $e) {
+        continue;
+    }
+}
+
+if (!$foundUser || !password_verify($request->password, $foundUser->password)) {
+    return response(['errors' => trans('messages.login_failed')], 422);
+}
+
+$token = $foundUser->createToken('Personal Access Token')->accessToken;
+
+return response([
+    'message' => trans('messages.login_success'),
+    'data' => $foundUser,
+    'token' => $token,
+]);
+}
 
 
     public function profile()

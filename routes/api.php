@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AboutUsController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SocialCommunicationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +46,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/update_article/{article_id}', [ArticleController::class, 'update']);
     Route::delete('/delete_article/{article_id}', [ArticleController::class, 'destroy']);
     Route::delete('/delete_image/{image_id}', [ArticleController::class, 'destroyImage']);
+});
+
+Route::get('/gat_about_us', [AboutUsController::class, 'show']);
+Route::middleware('auth:api')->group(function () {
+    Route::post('/create_about_us', [AboutUsController::class, 'store']);
+    Route::post('/update_text/{about_us_id}', [AboutUsController::class, 'update']);
+});
+
+Route::get('/gat_social', [SocialCommunicationController::class, 'show']);
+Route::middleware('auth:api')->group(function () {
+    Route::post('/create_social', [SocialCommunicationController::class, 'store']);
+    Route::post('/update_social/{social_id}', [SocialCommunicationController::class, 'update']);
 });

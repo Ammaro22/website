@@ -57,15 +57,15 @@ class ArticleController extends Controller
 
     public function articlesByCategory($categoryId)
     {
-        $articles = Article::where('category_id', $categoryId)
-                            ->paginate(10); 
-    
+        $articles = Article::where('category_id', $categoryId)->with( 'image')
+                            ->paginate(10);
+
         if ($articles->isEmpty()) {
             return response()->json([
                 'message' => __('messages.not_found'),
             ], 404);
         }
-    
+
         return response()->json([
             'message' => __('messages.operation_success'),
             'data' => $articles,
@@ -140,69 +140,7 @@ class ArticleController extends Controller
         ], 200);
     }
 
-//    public function update(Request $request, $id)
-//    {
-//
-//        if (!$request->user() || $request->user()->type !== 'Admin') {
-//            return response()->json([
-//                'message' => __('messages.operation_failed'),
-//                'error' => 'messages.Unauthorized'
-//            ], 403);
-//        }
-//
-//        $article = Article::find($id);
-//        if (!$article) {
-//            return response()->json([
-//                'message' => __('messages.operation_failed'),
-//                'error' => __('messages.not_found')
-//            ], 404);
-//        }
-//
-//        $validator = Validator::make($request->all(), [
-//            'article_name' => 'nullable|string|max:255',
-//            'website_name' => 'nullable|string|max:255',
-//            'explain' => 'nullable|string',
-//            'url' => 'nullable|url',
-//            'category_id' => 'nullable|exists:categories,id',
-//            'images' => 'nullable|array',
-//            'images.*' => 'image|mimes:jpg,png,jpeg,gif',
-//        ]);
-//
-//        if ($validator->fails()) {
-//            return response()->json([
-//                'message' => __('messages.operation_failed'),
-//                'errors' => $validator->errors()
-//            ], 422);
-//        }
-//
-//        $article->update($request->except('images'));
-//        if ($request->has('images')) {
-//
-//            foreach ($article->image as $image) {
-//                $filePath = public_path('articles/' . basename($image->path));
-//
-//                \Log::info("Attempting to delete file: " . $filePath);
-//
-//                if (File::exists($filePath)) {
-//                    if (File::delete($filePath)) {
-//                        \Log::info("Successfully deleted: " . $filePath);
-//                    } else {
-//                        \Log::warning("Failed to delete: " . $filePath);
-//                    }
-//                } else {
-//                    \Log::warning("File not found for deletion: " . $filePath);
-//                }
-//                $image->delete();
-//            }
-//
-//            $this->ssave($request->file('images'), $article->id);
-//        }
-//
-//        return response()->json([
-//            'message' => __('messages.operation_success'),
-//            'data' => $article,
-//        ], 200);
-//    }
+
 
     public function destroyImage(Request $request, $id)
     {
@@ -244,21 +182,22 @@ class ArticleController extends Controller
         $request->validate([
             'website_name' => 'required|string|max:255',
         ]);
-    
+
         $websiteName = $request->input('website_name');
-    
+
         $articles = Article::where('website_name', 'like', '%' . $websiteName . '%')
-                           ->paginate(10); 
-    
+                           ->paginate(10);
+
         if ($articles->isEmpty()) {
             return response()->json(['message' => __('messages.not_found')], 404);
         }
-    
+
         return response()->json([
             'message' => __('messages.operation_success'),
             'data' => $articles,
         ], 200);
     }
+
     public function destroy(Request $request, $id = null)
     {
         if (is_null($id)) {
