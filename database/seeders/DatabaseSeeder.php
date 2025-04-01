@@ -14,9 +14,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-
-         Type::create([
-             'Type' => 'Admin',
-         ]);
+        $this->call(SocialCommunicationSeeder::class);
     }
 }
