@@ -73,19 +73,21 @@ class SocialCommunicationController extends Controller
                 'error' => 'messages.NotFound'
             ], 404);
         }
-        $formattedData = [];
 
-        foreach ($socialCommunication as $item) {
-            $formattedData[] = $item->name;
-            $formattedData[] = [
-                'id' => $item->id,
-                'address' => $item->address
+        $formattedData = $socialCommunication->Map(function ($item) {
+            return [
+                $item->name,
+                [
+                    'id' => $item->id,
+                    'address' => $item->address
+                ]
             ];
-        }
+        });
 
         return response()->json([
             'message' => __('messages.operation_success'),
             'data' => $formattedData,
         ], 200);
     }
+
 }
