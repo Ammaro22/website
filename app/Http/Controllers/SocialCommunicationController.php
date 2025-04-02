@@ -64,25 +64,24 @@ class SocialCommunicationController extends Controller
 
     public function show()
     {
-
         $socialCommunication = Social_communication::all();
 
-        if (!$socialCommunication) {
+        if ($socialCommunication->isEmpty()) {
             return response()->json([
                 'message' => __('messages.operation_failed'),
                 'error' => 'messages.NotFound'
             ], 404);
         }
 
-        $formattedData = $socialCommunication->Map(function ($item) {
+
+        $formattedData = $socialCommunication->map(function ($item) {
             return [
-                $item->name,
-                [
+                $item->name => [
                     'id' => $item->id,
                     'address' => $item->address
                 ]
             ];
-        });
+        })->toArray(); 
 
         return response()->json([
             'message' => __('messages.operation_success'),
