@@ -81,7 +81,7 @@ class SocialCommunicationController extends Controller
                     'address' => $item->address
                 ]
             ];
-        })->toArray(); 
+        })->toArray();
 
         return response()->json([
             'message' => __('messages.operation_success'),
