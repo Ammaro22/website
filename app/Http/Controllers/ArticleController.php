@@ -55,10 +55,25 @@ class ArticleController extends Controller
         ], 201);
     }
 
+//    public function articlesByCategory($categoryId)
+//    {
+//        $articles = Article::where('category_id', $categoryId)->with( 'image')
+//                            ->paginate(10);
+//
+//        if ($articles->isEmpty()) {
+//            return response()->json([
+//                'message' => __('messages.not_found'),
+//            ], 404);
+//        }
+//
+//        return response()->json([
+//            'message' => __('messages.operation_success'),
+//            'data' => $articles,
+//        ], 200);
+//    }
     public function articlesByCategory($categoryId)
     {
-        $articles = Article::where('category_id', $categoryId)->with( 'image')
-                            ->paginate(10);
+        $articles = Article::where('category_id', $categoryId)->with('image')->paginate(10);
 
         if ($articles->isEmpty()) {
             return response()->json([
@@ -66,9 +81,24 @@ class ArticleController extends Controller
             ], 404);
         }
 
+        $formattedArticles = $articles->map(function($article) {
+            return [
+                'id' => $article->id,
+                'title' => $article->title,
+                'article_name'=> $article->article_name,
+                'website_name'=> $article->website_name,
+                'explain'=> $article->explain,
+                'url'=> $article->url,
+                'category_id'=> $article->category_id,
+                'image' => $article->image
+            ];
+        });
+
         return response()->json([
             'message' => __('messages.operation_success'),
-            'data' => $articles,
+            'data' => $formattedArticles,
+            'next_page_url' => $articles->nextPageUrl(),
+            'prev_page_url' => $articles->previousPageUrl(),
         ], 200);
     }
 
