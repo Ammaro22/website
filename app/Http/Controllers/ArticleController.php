@@ -31,7 +31,7 @@ class ArticleController extends Controller
             'explain' => 'required|string',
             'url' => 'required|url',
             'category_id' => 'required|exists:categories,id',
-            'images' => 'array',
+            'images' => 'required|array',
             'images.*' => 'image|mimes:jpg,png,jpeg,gif',
         ]);
 
@@ -55,22 +55,6 @@ class ArticleController extends Controller
         ], 201);
     }
 
-//    public function articlesByCategory($categoryId)
-//    {
-//        $articles = Article::where('category_id', $categoryId)->with( 'image')
-//                            ->paginate(10);
-//
-//        if ($articles->isEmpty()) {
-//            return response()->json([
-//                'message' => __('messages.not_found'),
-//            ], 404);
-//        }
-//
-//        return response()->json([
-//            'message' => __('messages.operation_success'),
-//            'data' => $articles,
-//        ], 200);
-//    }
     public function articlesByCategory($categoryId)
     {
         $articles = Article::where('category_id', $categoryId)->with('image')->paginate(10);
@@ -169,8 +153,6 @@ class ArticleController extends Controller
             'data' => $article,
         ], 200);
     }
-
-
 
     public function destroyImage(Request $request, $id)
     {
